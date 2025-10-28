@@ -1,42 +1,45 @@
-import React from 'react';
-import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api';
-import './styles.css';
-import data from './data';
-
-const containerStyle = {
-  width: '100%',
-  height: '400px'
-};
-
-const center = {
-  lat: 53.3498,
-  lng: -6.2603
-};
+import React, { useState } from "react";
+import data from "./data";
+import "./styles.css";
 
 function App() {
+  const [search, setSearch] = useState("");
+
+  const filteredData = data.filter((place) =>
+    place.name.toLowerCase().includes(search.toLowerCase()) ||
+    place.area.toLowerCase().includes(search.toLowerCase())
+  );
+
   return (
     <div className="app">
       <h1>LocalWorship Dublin</h1>
-      <div className="map-container">
-        <LoadScript googleMapsApiKey="YOUR_GOOGLE_MAPS_API_KEY">
-          <GoogleMap mapContainerStyle={containerStyle} center={center} zoom={12}>
-            {data.map((place, index) => (
-              <Marker key={index} position={place.position} />
-            ))}
-          </GoogleMap>
-        </LoadScript>
-      </div>
-      <div className="cards">
-        {data.map((place, index) => (
-          <div key={index} className="card">
-            <h3>{place.name}</h3>
-            <p>{place.address}</p>
-            <a href={place.link} target="_blank" rel="noreferrer">View on Google Maps</a>
-          </div>
-        ))}
+
+      <input
+        type="text"
+        placeholder="Search by name or area..."
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        className="search-bar"
+      />
+
+      <div className="card-grid">
+        {filteredData.length > 0 ? (
+          filteredData.map((place) => (
+            <div key={place.name} className="card">
+              <h3>{place.name}</h3>
+              <p>{place.area}</p>
+              <a href={place.mapLink} target="_blank" rel="noopener noreferrer">
+                View on Google Maps
+              </a>
+            </div>
+          ))
+        ) : (
+          <p className="no-results">No matching results found.</p>
+        )}
       </div>
     </div>
   );
 }
 
 export default App;
+
